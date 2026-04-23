@@ -101,3 +101,7 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# Local docs not intended for GitHub
+ALL_CODE.md
+SpaceShooter_Reference.md
