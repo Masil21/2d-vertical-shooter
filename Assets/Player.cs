@@ -7,10 +7,10 @@ public class Player : MonoBehaviour
 
     public float moveSpeed = 5f;
     public float fireRate = 0.2f;
-    public int hp = 100;
 
     private float _nextFireTime = 0f;
     private Animator _anim;
+    private bool isInvincible = false;
 
     void Start()
     {
@@ -20,6 +20,12 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+        GameOver gameOver = FindAnyObjectByType<GameOver>();
+        if (gameOver != null && gameOver.IsGameOver())
+        {
+            return;
+        }
+
         Move();
         Shoot();
     }
@@ -66,6 +72,8 @@ public class Player : MonoBehaviour
 
     public void TakeDamage()
     {
+        if (isInvincible) return;
+
         Debug.Log("사망..");
         gameObject.SetActive(false);
 
@@ -76,13 +84,21 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void SetInvincible(bool value)
+    {
+        isInvincible = value;
+    }
+
     void OnTriggerEnter2D(Collider2D other)
     {
+        if (isInvincible) return;
+
         EnemyController enemy = other.GetComponent<EnemyController>();
 
         if (enemy != null)
         {
             TakeDamage();
+            return;
         }
 
         EnemyBullitController enemyBullet = other.GetComponent<EnemyBullitController>();
@@ -90,6 +106,7 @@ public class Player : MonoBehaviour
         if (enemyBullet != null)
         {
             TakeDamage();
+            return;
         }
     }
 }

@@ -12,7 +12,7 @@ public class GameOver : MonoBehaviour
     public TextMeshProUGUI gameOverScoreText;
     private int totalScore = 0;
     public Button retryButton;
-    
+    private bool isGameOver = false;
 
     public Image life_0;
     public Image life_1;
@@ -32,10 +32,16 @@ public class GameOver : MonoBehaviour
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         });
     }
+
     public void AddScore(int score)
     {
         totalScore += score;
         scoreText.text = $"{totalScore}";
+    }
+
+    public bool IsGameOver()
+    {
+        return isGameOver;
     }
 
     public void PlayerDead()
@@ -53,6 +59,8 @@ public class GameOver : MonoBehaviour
         else if (lifeCount == 0)
         {
             life_0.gameObject.SetActive(false);
+            CancelInvoke("Respawn");
+            CancelInvoke("EndPlayerInvincible");
             GameOverSequence();
             return;
         }
@@ -62,10 +70,11 @@ public class GameOver : MonoBehaviour
 
     void GameOverSequence()
     {
+        isGameOver = true;
         gameOverPanel.SetActive(true);
+        gameOverScoreText.text = $"Score : {totalScore}";
         player.SetActive(false);
         spawnPointGroup.SetActive(false);
-        gameOverScoreText.text = $"Score : {totalScore}";
 
         GameObject[] enemyClones = GameObject.FindGameObjectsWithTag("Enemy");
         for (int i = 0; i < enemyClones.Length; i++)
@@ -88,14 +97,18 @@ public class GameOver : MonoBehaviour
 
     void Respawn()
     {
-        Player playerScript = player.GetComponent<Player>();
-        playerScript.hp = 100;
         player.transform.position = new Vector3(0, -3f, 0);
         player.SetActive(true);
+
+        Player playerScript = player.GetComponent<Player>();
+        playerScript.SetInvincible(true);
+
+        Invoke("EndPlayerInvincible", 2f);
     }
 
-    public void OnRetryButton()
+    void EndPlayerInvincible()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        Player playerScript = player.GetComponent<Player>();
+        playerScript.SetInvincible(false);
     }
 }
