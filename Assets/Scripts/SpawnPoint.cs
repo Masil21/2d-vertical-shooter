@@ -37,6 +37,11 @@ public class SpawnPoint : MonoBehaviour
         EnemyController ec = enemyGo.GetComponent<EnemyController>();
         ec.moveDirection = moveDir;
 
+        ec.onDie = (pos) =>
+        {
+            ItemManager3.Instance.CreateItem(pos);
+        };
+
         float delay = Random.Range(4f, 8f);
         Invoke($"Spawn_{pointIndex}", delay);
     }
@@ -51,6 +56,11 @@ public class SpawnPoint : MonoBehaviour
 
         EnemyController ec = enemyGo.GetComponent<EnemyController>();
         ec.moveDirection = direction.normalized;
+
+        ec.onDie = (pos) =>
+        {
+            ItemManager3.Instance.CreateItem(pos);
+        };
 
         float delay = Random.Range(4f, 8f);
         Invoke($"Spawn_{fromIndex}", delay);

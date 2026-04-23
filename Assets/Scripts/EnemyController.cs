@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour
@@ -6,6 +7,8 @@ public class EnemyController : MonoBehaviour
     public Vector3 moveDirection = Vector3.down;
     public int hp = 16;
     public int score = 10;
+
+    public Action<Vector3> onDie;
 
     private SpriteRenderer sr;
     private Sprite originalSprite;
@@ -58,6 +61,7 @@ public class EnemyController : MonoBehaviour
                 gameOver.AddScore(score);
             }
 
+            onDie?.Invoke(transform.position);
             Destroy(gameObject);
         }
     }

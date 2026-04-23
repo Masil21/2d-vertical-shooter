@@ -3,7 +3,9 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public Transform firePoint;
-    public GameObject PlayerBulletPrefab;
+    public GameObject Power1Prefab;
+    public GameObject Power2Prefab;
+    public GameObject Power3Prefab;
 
     public float moveSpeed = 5f;
     public float fireRate = 0.2f;
@@ -11,6 +13,7 @@ public class Player : MonoBehaviour
     private float _nextFireTime = 0f;
     private Animator _anim;
     private bool isInvincible = false;
+    private int powerLevel = 1;
 
     void Start()
     {
@@ -56,7 +59,18 @@ public class Player : MonoBehaviour
         {
             _nextFireTime = Time.time + fireRate;
 
-            GameObject bullet = Instantiate(PlayerBulletPrefab);
+            GameObject bulletPrefab = Power1Prefab;
+
+            if (powerLevel == 2)
+            {
+                bulletPrefab = Power2Prefab;
+            }
+            else if (powerLevel >= 3)
+            {
+                bulletPrefab = Power3Prefab;
+            }
+
+            GameObject bullet = Instantiate(bulletPrefab);
             bullet.transform.position = firePoint.position;
 
             if (bullet.transform.childCount == 0)
@@ -75,6 +89,7 @@ public class Player : MonoBehaviour
         if (isInvincible) return;
 
         Debug.Log("사망..");
+        powerLevel = 1;
         gameObject.SetActive(false);
 
         GameOver gameOver = FindAnyObjectByType<GameOver>();
@@ -89,9 +104,45 @@ public class Player : MonoBehaviour
         isInvincible = value;
     }
 
+    public void PowerUp()
+    {
+        if (powerLevel < 3)
+        {
+            powerLevel++;
+            Debug.Log($"파워 레벨 : {powerLevel}");
+        }
+    }
+
     void OnTriggerEnter2D(Collider2D other)
     {
         if (isInvincible) return;
+
+        var item3 = other.gameObject.GetComponent<Item3>();
+
+        if (item3 != null)
+        {
+            GameOver gameOver = FindAnyObjectByType<GameOver>();
+
+            if (item3.itemType == Item3.ItemType.Coin)
+            {
+                Debug.Log("Coin 획득!");
+                if (gameOver != null) gameOver.AddScore(100);
+            }
+            else if (item3.itemType == Item3.ItemType.Power)
+            {
+                Debug.Log("Power 획득!");
+                if (gameOver != null) gameOver.AddScore(500);
+                PowerUp();
+            }
+            else if (item3.itemType == Item3.ItemType.Boom)
+            {
+                Debug.Log("Boom 획득!");
+                if (gameOver != null) gameOver.AddScore(200);
+            }
+
+            Destroy(other.gameObject);
+            return;
+        }
 
         EnemyController enemy = other.GetComponent<EnemyController>();
 

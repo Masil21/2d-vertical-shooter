@@ -270,7 +270,55 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BullitController
   speed: 3
-  damage: 5
+  damage: 10
+--- !u!1 &447152118
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 447152119}
+  - component: {fileID: 447152120}
+  m_Layer: 0
+  m_Name: ' ItemManager3'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &447152119
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 447152118}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.38351, y: -1.93813, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &447152120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 447152118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff9e0bae9c99c9f4890267c8644589c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemManager3
+  items:
+  - {fileID: 8297684879636525370, guid: 77fe59e9f6b9a7547a528f4aaeeba106, type: 3}
+  - {fileID: 6894921257715832933, guid: 72cb4511a8c733347b7b5312e7e2b7a5, type: 3}
+  - {fileID: 8564850777109727774, guid: 997b23ff6bf99914bbd6bb27cc5c7017, type: 3}
 --- !u!1 &516075991
 GameObject:
   m_ObjectHideFlags: 0
@@ -464,7 +512,7 @@ Transform:
   m_GameObject: {fileID: 521543672}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.79, y: 4.03, z: 0}
+  m_LocalPosition: {x: -2.79, y: 4.13, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -987,7 +1035,7 @@ Transform:
   m_GameObject: {fileID: 932652389}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.54, y: 3.96, z: 0}
+  m_LocalPosition: {x: 0.54, y: 4.13, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1102,7 +1150,7 @@ Transform:
   m_GameObject: {fileID: 1047682760}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.61, y: 4.01, z: 0}
+  m_LocalPosition: {x: -1.61, y: 4.13, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1872,10 +1920,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
   firePoint: {fileID: 983278269}
-  PlayerBulletPrefab: {fileID: 2092505776350734883, guid: 93f62afcc6172f849aeb48d5ed8bfcf5, type: 3}
+  Power1Prefab: {fileID: 2092505776350734883, guid: 93f62afcc6172f849aeb48d5ed8bfcf5, type: 3}
+  Power2Prefab: {fileID: 4657653400407097569, guid: fd4bd7cfa2e0fee44b1e7e6152fa0a1b, type: 3}
+  Power3Prefab: {fileID: 7765470806728016837, guid: c33db4fdae755d146941efea54a5cfcb, type: 3}
   moveSpeed: 5
   fireRate: 0.2
-  hp: 100
 --- !u!95 &1683595772
 Animator:
   serializedVersion: 7
@@ -2201,7 +2250,7 @@ Transform:
   m_GameObject: {fileID: 1981475837}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.52, y: 3.94, z: 0}
+  m_LocalPosition: {x: 1.52, y: 4.11, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2307,7 +2356,7 @@ Transform:
   m_GameObject: {fileID: 2087414780}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.52, y: 3.98, z: 0}
+  m_LocalPosition: {x: -0.52, y: 4.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2324,4 +2373,5 @@ SceneRoots:
   - {fileID: 1651775640}
   - {fileID: 1521878622}
   - {fileID: 1023965158}
+  - {fileID: 447152119}
   - {fileID: 516075992}
