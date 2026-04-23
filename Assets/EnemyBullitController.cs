@@ -24,7 +24,7 @@ public class EnemyBullitController : MonoBehaviour
 
         if (player != null)
         {
-            player.TakeDamage(damage);
+            player.TakeDamage();
             Destroy(gameObject);
         }
     }

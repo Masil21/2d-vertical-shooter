@@ -32,6 +32,10 @@ public class Player : MonoBehaviour
         Vector2 dir = new Vector2(h, v).normalized;
         transform.Translate(dir * moveSpeed * Time.deltaTime);
 
+        float clampX = Mathf.Clamp(transform.position.x, -2.27f, 2.27f);
+        float clampY = Mathf.Clamp(transform.position.y, -4.39f, 4.39f);
+        transform.position = new Vector3(clampX, clampY, 0);
+
         if (h < 0)
             _anim.SetInteger("State", 1);
         else if (h > 0)
@@ -60,21 +64,32 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage()
     {
-        hp -= damage;
-        Debug.Log($"Player HP : {hp}");
+        Debug.Log("사망..");
+        gameObject.SetActive(false);
 
-        if (hp <= 0)
+        GameOver gameOver = FindAnyObjectByType<GameOver>();
+        if (gameOver != null)
         {
-            Debug.Log("사망..");
-            gameObject.SetActive(false);
+            gameOver.PlayerDead();
+        }
+    }
 
-            GameOver gameOver = FindAnyObjectByType<GameOver>();
-            if (gameOver != null)
-            {
-                gameOver.PlayerDead();
-            }
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        EnemyController enemy = other.GetComponent<EnemyController>();
+
+        if (enemy != null)
+        {
+            TakeDamage();
+        }
+
+        EnemyBullitController enemyBullet = other.GetComponent<EnemyBullitController>();
+
+        if (enemyBullet != null)
+        {
+            TakeDamage();
         }
     }
 }
