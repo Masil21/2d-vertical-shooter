@@ -106,6 +106,12 @@
 
 ## Latest Updates
 
+### 2026-04-27 버그 수정 — 발사·Boom·UI 동작 복구
+
+- `GameScene`에 `ObjectPoolManager` GameObject를 직접 추가 — 씬 실행 즉시 모든 풀이 초기화됨
+- 좌클릭 연속 발사, 우클릭 Boom 발동, 우상단 Boom UI가 정상 작동
+- `SpawnPoint.SpawnEnemyToward` / `SpawnEnemy`에 `ObjectPoolManager.Instance` null 가드 추가 → NullReferenceException 해소
+
 ### 2026-04-27 오브젝트 풀링 도입
 
 - `ObjectPoolManager` 싱글톤 신규 추가
@@ -172,13 +178,12 @@ git clone https://github.com/Masil21/2d-vertical-shooter.git
 
 2. Unity Hub에서 프로젝트 폴더를 엽니다.
 3. `Assets/Scenes/GameScene.unity` 씬을 엽니다.
-4. Hierarchy에서 빈 GameObject를 만들고 `ObjectPoolManager` 컴포넌트를 추가한 뒤 프리팹을 연결합니다.
-5. Play로 실행합니다.
+4. Play로 실행합니다.
 
 ## Recent Commit Trail
 
+- `e8ff252` Fix: ObjectPoolManager 씬 추가 및 NullReference 버그 수정
+- `4fe8328` Feat: 오브젝트 풀링 시스템 도입
 - `c6529a9` Docs: improve README and add scrolling background
 - `a6726d8` Docs: refresh README with latest gameplay updates
 - `848526f` Update changes
-- `903b5f3` Update scenes, scripts, animations, and prefabs
-- `a750ee6` Restructure project assets and scripts
