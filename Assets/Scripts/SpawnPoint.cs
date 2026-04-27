@@ -29,6 +29,7 @@ public class SpawnPoint : MonoBehaviour
 
     void SpawnEnemy(int pointIndex, Vector3 moveDir)
     {
+        if (ObjectPoolManager.Instance == null) return;
         GameObject enemyGo = ObjectPoolManager.Instance.GetRandomEnemy();
         if (enemyGo == null)
         {
@@ -51,6 +52,7 @@ public class SpawnPoint : MonoBehaviour
 
     void SpawnEnemyToward(int fromIndex, int toIndex)
     {
+        if (ObjectPoolManager.Instance == null) return;
         GameObject enemyGo = ObjectPoolManager.Instance.GetRandomEnemy();
         if (enemyGo == null)
         {
