@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class SpawnPoint : MonoBehaviour
 {
-    public GameObject[] enemyPrefabs;
     public Transform[] spawnPoints;
 
     void Start()
@@ -30,40 +29,47 @@ public class SpawnPoint : MonoBehaviour
 
     void SpawnEnemy(int pointIndex, Vector3 moveDir)
     {
-        int idx = Random.Range(0, enemyPrefabs.Length);
-        GameObject enemyGo = Instantiate(enemyPrefabs[idx]);
-        enemyGo.transform.position = spawnPoints[pointIndex].position;
+        GameObject enemyGo = ObjectPoolManager.Instance.GetRandomEnemy();
+        if (enemyGo == null)
+        {
+            float delay = Random.Range(4f, 8f);
+            Invoke($"Spawn_{pointIndex}", delay);
+            return;
+        }
 
+        enemyGo.transform.position = spawnPoints[pointIndex].position;
+        enemyGo.SetActive(true);
+
+        // OnEnable이 Vector3.down으로 리셋하므로 이후에 덮어씀
         EnemyController ec = enemyGo.GetComponent<EnemyController>();
         ec.moveDirection = moveDir;
+        ec.onDie = (pos) => ItemManager3.Instance.CreateItem(pos);
 
-        ec.onDie = (pos) =>
-        {
-            ItemManager3.Instance.CreateItem(pos);
-        };
-
-        float delay = Random.Range(4f, 8f);
-        Invoke($"Spawn_{pointIndex}", delay);
+        float delay2 = Random.Range(4f, 8f);
+        Invoke($"Spawn_{pointIndex}", delay2);
     }
 
     void SpawnEnemyToward(int fromIndex, int toIndex)
     {
-        int idx = Random.Range(0, enemyPrefabs.Length);
-        GameObject enemyGo = Instantiate(enemyPrefabs[idx]);
-        enemyGo.transform.position = spawnPoints[fromIndex].position;
+        GameObject enemyGo = ObjectPoolManager.Instance.GetRandomEnemy();
+        if (enemyGo == null)
+        {
+            float delay = Random.Range(4f, 8f);
+            Invoke($"Spawn_{fromIndex}", delay);
+            return;
+        }
 
-        Vector3 direction = spawnPoints[toIndex].position - spawnPoints[fromIndex].position;
+        enemyGo.transform.position = spawnPoints[fromIndex].position;
+        enemyGo.SetActive(true);
+
+        Vector3 direction = (spawnPoints[toIndex].position - spawnPoints[fromIndex].position).normalized;
 
         EnemyController ec = enemyGo.GetComponent<EnemyController>();
-        ec.moveDirection = direction.normalized;
+        ec.moveDirection = direction;
+        ec.onDie = (pos) => ItemManager3.Instance.CreateItem(pos);
 
-        ec.onDie = (pos) =>
-        {
-            ItemManager3.Instance.CreateItem(pos);
-        };
-
-        float delay = Random.Range(4f, 8f);
-        Invoke($"Spawn_{fromIndex}", delay);
+        float delay2 = Random.Range(4f, 8f);
+        Invoke($"Spawn_{fromIndex}", delay2);
     }
 
     void OnDrawGizmos()

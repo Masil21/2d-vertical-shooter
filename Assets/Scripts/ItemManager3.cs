@@ -5,10 +5,6 @@ public class ItemManager3 : MonoBehaviour
 {
     public static ItemManager3 Instance;
 
-    public GameObject coinPrefab;
-    public GameObject powerPrefab;
-    public GameObject boomPrefab;
-
     void Awake()
     {
         Instance = this;
@@ -17,27 +13,17 @@ public class ItemManager3 : MonoBehaviour
     public void CreateItem(Vector3 pos)
     {
         int rand = Random.Range(0, 100);
-        GameObject prefab = null;
+        Item3.ItemType type;
 
-        if (rand < 30)
-        {
-            return;
-        }
-        else if (rand < 60)
-        {
-            prefab = coinPrefab;
-        }
-        else if (rand < 80)
-        {
-            prefab = powerPrefab;
-        }
-        else
-        {
-            prefab = boomPrefab;
-        }
+        if (rand < 30) return;
+        else if (rand < 60) type = Item3.ItemType.Coin;
+        else if (rand < 80) type = Item3.ItemType.Power;
+        else type = Item3.ItemType.Boom;
 
-        var go = Instantiate(prefab, pos, Quaternion.identity);
-        var item3 = go.GetComponent<Item3>();
-        StartCoroutine(item3.Move());
+        GameObject go = ObjectPoolManager.Instance.GetItem(type);
+        if (go == null) return;
+
+        go.transform.position = pos;
+        go.SetActive(true);
     }
 }

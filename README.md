@@ -22,7 +22,7 @@
 | --- | --- |
 | 한 줄 설명 | 위에서 내려오는 적을 격파하며 생존 점수를 쌓는 종스크롤 슈팅 게임 |
 | 핵심 재미 | 회피, 연사, 파워업, 아이템 수집, Boom을 활용한 긴급 화면 정리 |
-| 현재 구현 | 플레이어 이동, 연속 발사, 적 생성, 아이템 드롭, 파워 강화, Boom 시스템, 게임오버 UI, 배경 스크롤 |
+| 현재 구현 | 플레이어 이동, 연속 발사, 적 생성, 아이템 드롭, 파워 강화, Boom 시스템, 오브젝트 풀링, 게임오버 UI, 배경 스크롤 |
 | 플레이 목표 | 최대한 오래 살아남아 높은 점수를 기록하는 것 |
 
 ## What You See In Game
@@ -52,22 +52,36 @@
 
 ## Core Systems
 
-### 1. Shooting and Power Level
+### 1. Object Pooling
+
+- 게임 시작 시 총알, 적, 아이템을 미리 생성해 비활성화 상태로 보관합니다.
+- `ObjectPoolManager` 싱글톤이 모든 풀을 관리합니다.
+- `Instantiate` / `Destroy` 대신 `SetActive(true/false)`로 오브젝트를 재사용합니다.
+- GC(Garbage Collection) 발생을 최소화해 런타임 성능을 개선합니다.
+
+| 풀 대상 | 설명 |
+| --- | --- |
+| 플레이어 총알 (Power 1~3) | 발사 시 풀에서 꺼내고, 화면 밖 이탈 또는 적 충돌 시 반환 |
+| 적 총알 | 적이 발사, 화면 밖 이탈 또는 플레이어 충돌 시 반환 |
+| 적 | 스폰 시 풀에서 꺼내고, 사망 또는 화면 밖 이탈 시 반환, 재사용 시 HP 자동 리셋 |
+| 아이템 (Coin / Power / Boom) | 드롭 시 풀에서 꺼내고, 수집 또는 화면 밖 이탈 시 반환 |
+
+### 2. Shooting and Power Level
 
 - 기본 공격은 정면 연사입니다.
 - Power 아이템을 획득하면 무기 단계가 상승합니다.
-- 최대 3단계까지 강화되며, 단계에 따라 발사 프리팹이 달라집니다.
+- 최대 3단계까지 강화되며, 단계에 따라 다른 총알 풀을 사용합니다.
 
-### 2. Boom System
+### 3. Boom System
 
 - Boom 아이템을 획득하면 최대 3개까지 저장됩니다.
 - 우클릭으로 즉시 발동할 수 있습니다.
 - 발동 시 폭발 이펙트가 재생됩니다.
 - 일정 시간 동안 적에게 큰 피해를 반복 적용합니다.
-- 같은 시간 동안 화면의 적 탄환을 제거합니다.
+- 같은 시간 동안 화면의 적 탄환을 풀로 반환(제거)합니다.
 - 사용 후 Boom UI가 즉시 갱신됩니다.
 
-### 3. Item Drop System
+### 4. Item Drop System
 
 적 처치 시 아이템이 확률적으로 생성됩니다.
 
@@ -78,27 +92,36 @@
 | Power | 20% | 점수 +500, 화력 강화 |
 | Boom | 20% | 점수 +200, Boom +1 |
 
-### 4. UI Feedback
+### 5. UI Feedback
 
 - Score UI: 현재 점수를 실시간으로 표시
 - Life UI: 남은 라이프 3칸을 시각적으로 관리
 - Boom UI: Boom 보유 개수를 별도 아이콘으로 표시
 - Game Over UI: 최종 점수와 Retry 버튼 제공
 
-### 5. Background Scrolling
+### 6. Background Scrolling
 
 - 3장의 배경 SpriteRenderer를 순환 배치해 자동 스크롤을 구현했습니다.
 - 씬이 정지된 화면이 아니라 계속 전진하는 슈팅 게임처럼 느껴지도록 구성했습니다.
 
 ## Latest Updates
 
-### 2026-04-27 기준 반영 내용
+### 2026-04-27 오브젝트 풀링 도입
+
+- `ObjectPoolManager` 싱글톤 신규 추가
+- 플레이어 총알(Power 1~3), 적 총알, 적, 아이템 전체에 풀링 적용
+- `Instantiate` / `Destroy` 호출 제거 → `SetActive` 기반 재사용으로 전환
+- `EnemyController` `OnEnable`에서 HP / 스프라이트 자동 리셋
+- `EnemyBullit` `OnEnable`에서 조준 상태 자동 리셋
+- `Item3` 코루틴 이동 방식 → `Update` 직접 이동으로 단순화
+- `ParentCleaner` 자식 전체 비활성 감지 시 컨테이너 풀 반환으로 수정
+- 각 스크립트에서 사용하지 않는 인스펙터 필드 제거
+
+### 이전 업데이트
 
 - Boom 애니메이션과 Boom 전용 프리팹 추가
 - Player, GameOver, ItemManager3 로직 확장
-- Boom 획득, 보유, 사용, UI 반영 흐름 연결
 - 아이템 드롭을 확률형 구조로 변경
-- GameScene 프리팹/씬 구성 업데이트
 - BackgroundScroller 추가로 자동 배경 스크롤 구현
 
 ## Project Overview
@@ -119,6 +142,7 @@ spaceShooters/
 │   ├── Scenes/
 │   │   └── GameScene.unity
 │   ├── Scripts/
+│   │   ├── ObjectPoolManager.cs   ← 신규
 │   │   ├── Player.cs
 │   │   ├── GameOver.cs
 │   │   ├── ItemManager3.cs
@@ -148,10 +172,12 @@ git clone https://github.com/Masil21/2d-vertical-shooter.git
 
 2. Unity Hub에서 프로젝트 폴더를 엽니다.
 3. `Assets/Scenes/GameScene.unity` 씬을 엽니다.
-4. Play로 실행합니다.
+4. Hierarchy에서 빈 GameObject를 만들고 `ObjectPoolManager` 컴포넌트를 추가한 뒤 프리팹을 연결합니다.
+5. Play로 실행합니다.
 
 ## Recent Commit Trail
 
+- `c6529a9` Docs: improve README and add scrolling background
 - `a6726d8` Docs: refresh README with latest gameplay updates
 - `848526f` Update changes
 - `903b5f3` Update scenes, scripts, animations, and prefabs

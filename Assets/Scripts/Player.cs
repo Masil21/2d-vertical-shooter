@@ -3,9 +3,6 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public Transform firePoint;
-    public GameObject Power1Prefab;
-    public GameObject Power2Prefab;
-    public GameObject Power3Prefab;
     public GameObject boomAnimationPrefab;
 
     public float moveSpeed = 5f;
@@ -58,33 +55,32 @@ public class Player : MonoBehaviour
 
     void Shoot()
     {
-        if (Input.GetMouseButton(0) && Time.time >= _nextFireTime)
+        if (!Input.GetMouseButton(0) || Time.time < _nextFireTime) return;
+        _nextFireTime = Time.time + fireRate;
+
+        if (ObjectPoolManager.Instance == null) return;
+
+        GameObject bullet = ObjectPoolManager.Instance.GetPlayerBullet(powerLevel);
+        if (bullet == null) return;
+
+        bullet.transform.position = firePoint.position;
+
+        if (bullet.transform.childCount == 0)
         {
-            _nextFireTime = Time.time + fireRate;
-
-            GameObject bulletPrefab = Power1Prefab;
-
-            if (powerLevel == 2)
-            {
-                bulletPrefab = Power2Prefab;
-            }
-            else if (powerLevel >= 3)
-            {
-                bulletPrefab = Power3Prefab;
-            }
-
-            GameObject bullet = Instantiate(bulletPrefab);
-            bullet.transform.position = firePoint.position;
-
-            if (bullet.transform.childCount == 0)
-            {
+            // 단독 총알: BullitController 없으면 추가 (첫 활성화 시 1회만)
+            if (bullet.GetComponent<BullitController>() == null)
                 bullet.AddComponent<BullitController>();
-            }
-            else
-            {
-                bullet.AddComponent<ParentCleaner>();
-            }
         }
+        else
+        {
+            // 멀티 총알 컨테이너: 자식들 재활성화
+            for (int i = 0; i < bullet.transform.childCount; i++)
+                bullet.transform.GetChild(i).gameObject.SetActive(true);
+            if (bullet.GetComponent<ParentCleaner>() == null)
+                bullet.AddComponent<ParentCleaner>();
+        }
+
+        bullet.SetActive(true);
     }
 
     void UseBoom()
@@ -128,7 +124,10 @@ public class Player : MonoBehaviour
             GameObject[] enemyBullets = GameObject.FindGameObjectsWithTag("EnemyBullet");
             for (int i = 0; i < enemyBullets.Length; i++)
             {
-                Destroy(enemyBullets[i]);
+                if (ObjectPoolManager.Instance != null)
+                    ObjectPoolManager.Instance.ReturnToPool(enemyBullets[i]);
+                else
+                    Destroy(enemyBullets[i]);
             }
 
             elapsed += Time.deltaTime;
@@ -206,7 +205,7 @@ public class Player : MonoBehaviour
                 AddBoom();
             }
 
-            Destroy(other.gameObject);
+            ObjectPoolManager.Instance.ReturnToPool(other.gameObject);
             return;
         }
 

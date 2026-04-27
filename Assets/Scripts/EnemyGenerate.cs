@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class EnemyGenerate : MonoBehaviour
 {
-    public GameObject[] enemyPrefabs;
     private float delta = 0;
     private float spawnTime = 0;
 
@@ -17,11 +16,19 @@ public class EnemyGenerate : MonoBehaviour
 
         if (delta > spawnTime)
         {
-            int idx = Random.Range(0, enemyPrefabs.Length);
-            GameObject enemyGo = Instantiate(enemyPrefabs[idx]);
-            enemyGo.transform.position = new Vector3(Random.Range(-2.4f, 2.4f), 4.5f, 0);
+            SpawnEnemy();
             delta = 0;
             spawnTime = Random.Range(1f, 3f);
         }
+    }
+
+    void SpawnEnemy()
+    {
+        GameObject enemyGo = ObjectPoolManager.Instance.GetRandomEnemy();
+        if (enemyGo == null) return;
+
+        enemyGo.transform.position = new Vector3(Random.Range(-2.4f, 2.4f), 4.5f, 0);
+        enemyGo.SetActive(true);
+        // moveDirection은 EnemyController.OnEnable에서 Vector3.down으로 리셋됨
     }
 }

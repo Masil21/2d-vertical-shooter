@@ -14,13 +14,25 @@ public class EnemyController : MonoBehaviour
     private Sprite originalSprite;
     public Sprite hitSprite;
 
+    private int maxHp;
     private float delta = 0;
     private bool isHit = false;
 
-    void Start()
+    void Awake()
     {
         sr = GetComponent<SpriteRenderer>();
         originalSprite = sr.sprite;
+        maxHp = hp;
+    }
+
+    void OnEnable()
+    {
+        hp = maxHp;
+        isHit = false;
+        delta = 0;
+        moveDirection = Vector3.down;
+        onDie = null;
+        if (sr != null) sr.sprite = originalSprite;
     }
 
     void Update()
@@ -40,7 +52,8 @@ public class EnemyController : MonoBehaviour
 
         if (transform.position.y < -4.5f)
         {
-            Destroy(gameObject);
+            onDie = null;
+            ReturnToPool();
         }
     }
 
@@ -57,13 +70,20 @@ public class EnemyController : MonoBehaviour
         {
             GameOver gameOver = FindAnyObjectByType<GameOver>();
             if (gameOver != null)
-            {
                 gameOver.AddScore(score);
-            }
 
             onDie?.Invoke(transform.position);
-            Destroy(gameObject);
+            onDie = null;
+            ReturnToPool();
         }
+    }
+
+    void ReturnToPool()
+    {
+        if (ObjectPoolManager.Instance != null)
+            ObjectPoolManager.Instance.ReturnToPool(gameObject);
+        else
+            Destroy(gameObject);
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -73,16 +93,7 @@ public class EnemyController : MonoBehaviour
         if (bullet != null)
         {
             TakeDamage(bullet.damage);
-
-            if (other.transform.parent != null)
-            {
-                if (other.transform.parent.childCount <= 1)
-                {
-                    Destroy(other.transform.parent.gameObject);
-                }
-            }
-
-            Destroy(other.gameObject);
+            bullet.ReturnOrDeactivate();
         }
     }
 }

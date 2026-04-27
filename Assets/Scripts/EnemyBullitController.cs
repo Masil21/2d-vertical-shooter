@@ -14,17 +14,21 @@ public class EnemyBullitController : MonoBehaviour
 
         if (pos.y < -5f || pos.y > 5f || pos.x < -3f || pos.x > 3f)
         {
-            Destroy(gameObject);
+            ReturnToPool();
         }
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        Player player = other.GetComponent<Player>();
+        if (other.GetComponent<Player>() != null)
+            ReturnToPool();
+    }
 
-        if (player != null)
-        {
+    void ReturnToPool()
+    {
+        if (ObjectPoolManager.Instance != null)
+            ObjectPoolManager.Instance.ReturnToPool(gameObject);
+        else
             Destroy(gameObject);
-        }
     }
 }

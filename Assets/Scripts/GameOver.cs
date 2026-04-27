@@ -100,19 +100,19 @@ public class GameOver : MonoBehaviour
         GameObject[] enemyClones = GameObject.FindGameObjectsWithTag("Enemy");
         for (int i = 0; i < enemyClones.Length; i++)
         {
-            Destroy(enemyClones[i]);
+            ObjectPoolManager.Instance.ReturnToPool(enemyClones[i]);
         }
 
         GameObject[] enemyBullets = GameObject.FindGameObjectsWithTag("EnemyBullet");
         for (int i = 0; i < enemyBullets.Length; i++)
         {
-            Destroy(enemyBullets[i]);
+            ObjectPoolManager.Instance.ReturnToPool(enemyBullets[i]);
         }
 
         GameObject[] playerBullets = GameObject.FindGameObjectsWithTag("PlayerBullet");
         for (int i = 0; i < playerBullets.Length; i++)
         {
-            Destroy(playerBullets[i]);
+            ObjectPoolManager.Instance.ReturnToPool(playerBullets[i]);
         }
     }
 

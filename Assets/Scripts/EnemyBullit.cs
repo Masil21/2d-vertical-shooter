@@ -2,8 +2,7 @@ using UnityEngine;
 
 public class EnemyBullit : MonoBehaviour
 {
-    public GameObject enemyBullitPrefab;
-    public Transform firePoint;
+    private Transform firePoint;
 
     private float delta = 0;
     private int shotCount = 0;
@@ -15,10 +14,21 @@ public class EnemyBullit : MonoBehaviour
 
     private GameObject player;
 
-    void Start()
+    void Awake()
     {
         firePoint = transform.Find("firePoint");
+    }
+
+    void OnEnable()
+    {
         player = GameObject.Find("Player");
+        delta = 0;
+        shotCount = 0;
+        isResting = false;
+        restDelta = 0;
+        isAiming = true;
+        aimDelta = 0;
+        targetDirection = Vector3.down;
     }
 
     void Update()
@@ -73,16 +83,19 @@ public class EnemyBullit : MonoBehaviour
 
     void Shoot()
     {
-        if (enemyBullitPrefab == null || firePoint == null) return;
+        if (firePoint == null) return;
 
-        GameObject bulletGo = Instantiate(enemyBullitPrefab);
+        GameObject bulletGo = ObjectPoolManager.Instance.GetEnemyBullet();
+        if (bulletGo == null) return;
+
         bulletGo.transform.position = firePoint.position;
 
         EnemyBullitController ebc = bulletGo.GetComponent<EnemyBullitController>();
-
         if (ebc != null)
         {
             ebc.moveDirection = targetDirection;
         }
+
+        bulletGo.SetActive(true);
     }
 }
