@@ -6,6 +6,7 @@ public class Player : MonoBehaviour
     public GameObject Power1Prefab;
     public GameObject Power2Prefab;
     public GameObject Power3Prefab;
+    public GameObject boomAnimationPrefab;
 
     public float moveSpeed = 5f;
     public float fireRate = 0.2f;
@@ -14,6 +15,7 @@ public class Player : MonoBehaviour
     private Animator _anim;
     private bool isInvincible = false;
     private int powerLevel = 1;
+    public int boomCount = 0;
 
     void Start()
     {
@@ -31,6 +33,7 @@ public class Player : MonoBehaviour
 
         Move();
         Shoot();
+        UseBoom();
     }
 
     void Move()
@@ -84,6 +87,70 @@ public class Player : MonoBehaviour
         }
     }
 
+    void UseBoom()
+    {
+        if (Input.GetMouseButtonDown(1) && boomCount > 0)
+        {
+            boomCount--;
+
+            GameOver gameOver = FindAnyObjectByType<GameOver>();
+            if (gameOver != null)
+            {
+                gameOver.UseBoom();
+            }
+
+            GameObject boomEffect = Instantiate(boomAnimationPrefab);
+            boomEffect.transform.position = Vector3.zero;
+            Destroy(boomEffect, 2f);
+
+            StartCoroutine(BoomDuration());
+
+            Debug.Log($"Boom 사용! 남은 Boom: {boomCount}");
+        }
+    }
+
+    System.Collections.IEnumerator BoomDuration()
+    {
+        float elapsed = 0f;
+
+        while (elapsed < 2f)
+        {
+            GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+            for (int i = 0; i < enemies.Length; i++)
+            {
+                EnemyController ec = enemies[i].GetComponent<EnemyController>();
+                if (ec != null)
+                {
+                    ec.TakeDamage(9999);
+                }
+            }
+
+            GameObject[] enemyBullets = GameObject.FindGameObjectsWithTag("EnemyBullet");
+            for (int i = 0; i < enemyBullets.Length; i++)
+            {
+                Destroy(enemyBullets[i]);
+            }
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+    }
+
+    public void AddBoom()
+    {
+        if (boomCount < 3)
+        {
+            boomCount++;
+            Debug.Log($"Boom 획득! 현재 Boom: {boomCount}");
+
+            GameOver gameOver = FindAnyObjectByType<GameOver>();
+            if (gameOver != null)
+            {
+                gameOver.UpdateBoomUI(boomCount);
+            }
+        }
+    }
+
     public void TakeDamage()
     {
         if (isInvincible) return;
@@ -115,8 +182,6 @@ public class Player : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (isInvincible) return;
-
         var item3 = other.gameObject.GetComponent<Item3>();
 
         if (item3 != null)
@@ -138,11 +203,14 @@ public class Player : MonoBehaviour
             {
                 Debug.Log("Boom 획득!");
                 if (gameOver != null) gameOver.AddScore(200);
+                AddBoom();
             }
 
             Destroy(other.gameObject);
             return;
         }
+
+        if (isInvincible) return;
 
         EnemyController enemy = other.GetComponent<EnemyController>();
 

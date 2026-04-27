@@ -18,6 +18,10 @@ public class GameOver : MonoBehaviour
     public Image life_1;
     public Image life_2;
 
+    public Image boom_0;
+    public Image boom_1;
+    public Image boom_2;
+
     private int lifeCount = 3;
 
     void Start()
@@ -26,6 +30,10 @@ public class GameOver : MonoBehaviour
         lifeCount = 3;
         totalScore = 0;
         scoreText.text = "0";
+
+        boom_0.gameObject.SetActive(false);
+        boom_1.gameObject.SetActive(false);
+        boom_2.gameObject.SetActive(false);
 
         retryButton.onClick.AddListener(() =>
         {
@@ -42,6 +50,19 @@ public class GameOver : MonoBehaviour
     public bool IsGameOver()
     {
         return isGameOver;
+    }
+
+    public void UpdateBoomUI(int boomCount)
+    {
+        boom_0.gameObject.SetActive(boomCount >= 1);
+        boom_1.gameObject.SetActive(boomCount >= 2);
+        boom_2.gameObject.SetActive(boomCount >= 3);
+    }
+
+    public void UseBoom()
+    {
+        Player playerScript = player.GetComponent<Player>();
+        UpdateBoomUI(playerScript.boomCount);
     }
 
     public void PlayerDead()
